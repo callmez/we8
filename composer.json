@@ -1,0 +1,18 @@
+{
+    "name": "callmez/we8",
+    "description": "We8",
+    "type": "library",
+    "authors": [
+        {
+            "name": "龙张",
+            "email": "callme-z@qq.com"
+        }
+    ],
+    "require": {
+        "mobiledetect/mobiledetectlib": "^2.8",
+        "yiisoft/yii2": "~2.0.16.1"
+    },
+    "autoload": {
+        "classmap": ["src/We8.php"]
+    }
+}
