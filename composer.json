@@ -9,8 +9,11 @@
         }
     ],
     "require": {
-        "mobiledetect/mobiledetectlib": "^2.8",
-        "yiisoft/yii2": "~2.0.16.1"
+        "mobiledetect/mobiledetectlib": "^2.8"
+    },
+    "suggest": {
+        "yiisoft/yii2": "Yii2 framework"
+
     },
     "autoload": {
         "classmap": ["src/We8.php"]
