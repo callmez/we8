@@ -1,7 +1,5 @@
 <?php
 
-defined('ABSPATH') || exit;
-
 class Loader
 {
     /**
