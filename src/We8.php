@@ -41,8 +41,10 @@ class We8
         define('STARTTIME', (YII_BEGIN_TIME - TIMESTAMP) . '0000 ' . TIMESTAMP);
         define('IA_ROOT', Yii::getAlias('@wp'));
 
+        define('CLIENT_IP', getip());
+
         define('DEVELOPMENT', YII_DEBUG);
-        define('ATTACHMENT_ROOT', wp_get_upload_dir()['basedir']);
+        define('ATTACHMENT_ROOT', wp_get_upload_dir()['basedir']); // TODO Yii方式获取
 
         // version
         define('IMS_FAMILY', 'common');
@@ -278,10 +280,9 @@ class We8
         $_W = $_GPC = [];
 
         $this->initConstants();
-        require_once WE8_PATH . '/helpers.php';
-        define('CLIENT_IP', getip());
 
         load()->classs('sqlparser');
+        load()->library('agent');
         load()->func('communication'); // TODO 替换
 
         $request = Yii::$app->request;
@@ -297,38 +298,28 @@ class We8
         $_W['siteroot'] = Yii::getAlias('@webroot') . '/';
         $_W['siteurl'] = $request->getAbsoluteUrl();
 
-        load()->library('agent');
-        $type = Agent::deviceType();
-        if ($type == Agent::DEVICE_MOBILE) {
-            $_W['os'] = 'mobile';
-        } elseif ($type == Agent::DEVICE_DESKTOP) {
-            $_W['os'] = 'windows';
-        } else {
-            $_W['os'] = 'unknown';
-        }
+        $osTypes = [
+            Agent::DEVICE_MOBILE  => 'mobile',
+            Agent::DEVICE_DESKTOP => 'windows',
+        ];
+        $_W['os'] = $osTypes[Agent::deviceType()] ?? 'unknown';
 
-        $type = Agent::browserType();
-        if (Agent::isMicroMessage() == Agent::MICRO_MESSAGE_YES) {
-            $_W['container'] = 'wechat';
-        } elseif ($type == Agent::BROWSER_TYPE_ANDROID) {
-            $_W['container'] = 'android';
-        } elseif ($type == Agent::BROWSER_TYPE_IPAD) {
-            $_W['container'] = 'ipad';
-        } elseif ($type == Agent::BROWSER_TYPE_IPHONE) {
-            $_W['container'] = 'iphone';
-        } elseif ($type == Agent::BROWSER_TYPE_IPOD) {
-            $_W['container'] = 'ipod';
-        } else {
-            $_W['container'] = 'unknown';
-        }
+        $containerTypes = [
+            Agent::MICRO_MESSAGE_YES    => 'wechat',
+            Agent::BROWSER_TYPE_ANDROID => 'android',
+            Agent::BROWSER_TYPE_IPAD    => 'ipad',
+            Agent::BROWSER_TYPE_IPHONE  => 'iphone',
+            Agent::BROWSER_TYPE_IPOD    => 'ipod',
+        ];
+        $_W['container'] = $containerTypes[Agent::deviceType()] ?? 'unknown';
 
         // TODO 目前全部接受COOKIE, 需过滤cookiepre?
         $_GPC = array_merge($_GPC, $_GET, $_POST, $_COOKIE);
-        if (!$_W['isajax']) {
+        if ( ! $_W['isajax']) {
             $input = file_get_contents("php://input");
-            if (!empty($input)) {
+            if ( ! empty($input)) {
                 $__input = @json_decode($input, true);
-                if (!empty($__input)) {
+                if ( ! empty($__input)) {
                     $_GPC['__input'] = $__input;
                     $_W['isajax'] = true;
                 }
