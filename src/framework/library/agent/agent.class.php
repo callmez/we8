@@ -40,12 +40,12 @@ class Agent
     /**
      * @var MobileDetect
      */
-    private $_detect;
+    private static $_detect;
 
     /**
      * @return MobileDetect
      */
-    public function getDetect()
+    public static function getDetect()
     {
         if (self::$_detect === null) {
             self::$_detect = new MobileDetect();

@@ -281,14 +281,32 @@ class We8
 
         $this->initConstants();
 
-        load()->classs('sqlparser');
         load()->library('agent');
+        load()->classs('sqlparser');
+        load()->classs('account');
         load()->func('communication'); // TODO 替换
 
         $request = Yii::$app->request;
 
+        $_W['config'] = [
+            'setting' => [
+                'charset' => Yii::$app->charset,
+                'timezone' => Yii::$app->timeZone,
+                'memory_limit' => WP_MEMORY_LIMIT,
+                'filemode' => '644',
+                'authkey' => substr(md5(AUTH_KEY), 8, 8),
+                'development' => YII_DEBUG ? 1 : 0,
+                'referrer' => 0,
+            ],
+            'cookie' => [
+                'pre' => '', // TODO
+                'domain' => '',
+                'path' => '/',
+            ],
+        ];
+
         $_W['timestamp'] = TIMESTAMP;
-        $_W['charset'] = Yii::$app->charset;
+        $_W['charset'] = $_W['config']['charset'];
         $_W['clientip'] = CLIENT_IP;
         $_W['ishttps'] = $request->getIsSecureConnection();
         $_W['isajax'] = $request->getIsAjax();
@@ -299,24 +317,24 @@ class We8
         $_W['siteurl'] = $request->getAbsoluteUrl();
 
         $osTypes = [
-            Agent::DEVICE_MOBILE  => 'mobile',
-            Agent::DEVICE_DESKTOP => 'windows',
+            \Agent::DEVICE_MOBILE  => 'mobile',
+            \Agent::DEVICE_DESKTOP => 'windows',
         ];
-        $_W['os'] = $osTypes[Agent::deviceType()] ?? 'unknown';
+        $_W['os'] = $osTypes[Agent::browserType()] ?? 'unknown';
 
         $containerTypes = [
-            Agent::MICRO_MESSAGE_YES    => 'wechat',
-            Agent::BROWSER_TYPE_ANDROID => 'android',
-            Agent::BROWSER_TYPE_IPAD    => 'ipad',
-            Agent::BROWSER_TYPE_IPHONE  => 'iphone',
-            Agent::BROWSER_TYPE_IPOD    => 'ipod',
+            \Agent::MICRO_MESSAGE_YES    => 'wechat',
+            \Agent::BROWSER_TYPE_ANDROID => 'android',
+            \Agent::BROWSER_TYPE_IPAD    => 'ipad',
+            \Agent::BROWSER_TYPE_IPHONE  => 'iphone',
+            \Agent::BROWSER_TYPE_IPOD    => 'ipod',
         ];
         $_W['container'] = $containerTypes[Agent::deviceType()] ?? 'unknown';
 
         // TODO 目前全部接受COOKIE, 需过滤cookiepre?
         $_GPC = array_merge($_GPC, $_GET, $_POST, $_COOKIE);
         if ( ! $_W['isajax']) {
-            $input = file_get_contents("php://input");
+            $input = Yii::$app->request->rawBody;
             if ( ! empty($input)) {
                 $__input = @json_decode($input, true);
                 if ( ! empty($__input)) {

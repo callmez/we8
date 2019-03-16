@@ -51,7 +51,7 @@ class Loader
     public function __call($type, $params)
     {
         $name = $cacheKey = array_shift($params);
-        if (isset($this->cache[$type][$cacheKey]) || empty($this->libraries[$type])) {
+        if (isset($this->cache[$type][$cacheKey]) || empty($this->types[$type])) {
             return true;
         } elseif ($type === 'library' && ! empty($this->libraries[$name])) {
             $name = $this->libraries[$name];
@@ -63,7 +63,6 @@ class Loader
         }
 
         include WE8_PATH . $file;
-        $this->cache[$type][$cacheKey] = true;
 
         return $this->cache[$type][$cacheKey] = true;
     }
@@ -764,10 +763,27 @@ function istrlen($str, $encoding = null)
     return mb_strlen($str, $encoding ?? Yii::$app->charset);
 }
 
-// TODO
-//function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
-//{
-//}
+/**
+ * 加密或者解密数据
+ *
+ * @param $string 加解密字符串
+ * @param string $operation 加密或解密
+ * @param string $key 签名秘钥
+ * @param int $expiry TODO 加入超时
+ *
+ * @return bool|mixed|string
+ */
+function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
+{
+    global $_W;
+    $key = $key ?: $_W['config']['setting']['authkey'];
+
+    $security = Yii::$app->security;
+    if ($operation === 'DECODE') {
+        return $security->decryptByKey(base64_decode($string), $key);
+    }
+    return str_replace('=', '', base64_encode($security->encryptByKey($string, $key)));
+}
 
 /**
  * 返回可读存储位
