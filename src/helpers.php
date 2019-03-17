@@ -1,5 +1,10 @@
 <?php
 
+use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
+use yii\helpers\HtmlPurifier;
+use weikit\core\exceptions\UnsupportedException;
+
 class Loader
 {
     /**
@@ -194,28 +199,33 @@ function getip()
     return $ip;
 }
 
-// TODO
-function token($specialadd = '')
+/**
+ * 生成CSRF token
+ *
+ * @param string $specialAdd
+ *
+ * @return string
+ */
+function token($specialAdd = '')
 {
-    global $_W;
-    if ( ! defined('IN_MOBILE')) {
-        return substr(md5($_W['config']['setting']['authkey'] . $specialadd), 8, 8);
-    } else {
-        if ( ! empty($_SESSION['token'])) {
-            $count = count($_SESSION['token']) - 5;
-            asort($_SESSION['token']);
-            foreach ($_SESSION['token'] as $k => $v) {
-                if (TIMESTAMP - $v > 300 || $count > 0) {
-                    unset($_SESSION['token'][$k]);
-                    $count--;
-                }
-            }
-        }
-        $key = substr(random(20), 0, 4);
-        $_SESSION['token'][$key] = TIMESTAMP;
-
-        return $key;
-    }
+//    if ( ! defined('IN_MOBILE')) {
+        return Yii::$app->request->getCsrfToken();
+//    } else {
+//        if ( ! empty($_SESSION['token'])) {
+//            $count = count($_SESSION['token']) - 5;
+//            asort($_SESSION['token']);
+//            foreach ($_SESSION['token'] as $k => $v) {
+//                if (TIMESTAMP - $v > 300 || $count > 0) {
+//                    unset($_SESSION['token'][$k]);
+//                    $count--;
+//                }
+//            }
+//        }
+//        $key = substr(random(20), 0, 4);
+//        $_SESSION['token'][$key] = TIMESTAMP;
+//
+//        return $key;
+//    }
 }
 
 /**
@@ -331,7 +341,7 @@ function array_elements($keys, $src, $default = false)
  */
 function iarray_sort($array, $key, $type = 'asc')
 {
-    \yii\helpers\ArrayHelper::multisort($array, $key, $type == 'asc' ? SORT_ASC : SORT_DESC);
+    ArrayHelper::multisort($array, $key, $type == 'asc' ? SORT_ASC : SORT_DESC);
 
     return $array;
 }
@@ -436,7 +446,7 @@ function wurl($segment, $params = [])
 {
     $params[0] = '/web/' . $segment;
 
-    return yii\helpers\Url::to($params);
+    return Url::to($params);
 }
 
 /**
@@ -452,7 +462,7 @@ function wurl($segment, $params = [])
 function murl($segment, $params = [], $noRedirect = true, $schema = false)
 {
     $params[0] = '/app/' . $segment;
-    $url = yii\helpers\Url::to($params, $schema);
+    $url = Url::to($params, $schema);
     if ($noRedirect) {
         $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
     }
@@ -1155,7 +1165,7 @@ function emoji_unicode_decode($string)
 function emoji_unicode_encode($string)
 {
     // TODO 转换emoji为emoji字符串
-    throw new \weikit\core\exceptions\UnsupportedException('Emoji encode not is support yet');
+    throw new UnsupportedException('Emoji encode not is support yet');
 }
 
 /**
@@ -1169,7 +1179,7 @@ function getglobal($key)
 {
     global $_W;
 
-    return \yii\helpers\ArrayHelper::getValue($_W, str_replace('/', '.', $key));
+    return ArrayHelper::getValue($_W, str_replace('/', '.', $key));
 }
 
 
@@ -1217,7 +1227,7 @@ function check_url_not_outside_link($redirect)
  */
 function remove_xss($val)
 {
-    return \yii\helpers\HtmlPurifier::process($val);
+    return HtmlPurifier::process($val);
 }
 
 /**

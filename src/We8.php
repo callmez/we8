@@ -8,28 +8,30 @@ class We8
      * @var We8
      */
     private static $_instance;
-
+    
     public static function initWeb()
     {
-        if (static::$_instance !== null) {
-            return;
+        if (static::$_instance == null) {
+            static::$_instance = new static('web');
         }
-
-        static::$_instance = new static();
     }
 
     public static function initApp()
     {
-        if (static::$_instance !== null) {
-            return;
+        if (static::$_instance === null) {
+            static::$_instance = new static('app');
         }
-
-        static::$_instance = new static();
     }
 
-    private function __construct()
+    /**
+     * We8 constructor.
+     *
+     * @param $type
+     */
+    private function __construct($type)
     {
         $this->init();
+        $this->{'start' . $type}();
     }
 
     public function initConstants()
@@ -279,6 +281,9 @@ class We8
         global $_W, $_GPC;
         $_W = $_GPC = [];
 
+        // 排除notice错误显示
+        error_reporting(error_reporting() & ~E_NOTICE);
+
         $this->initConstants();
 
         load()->library('agent');
@@ -306,7 +311,7 @@ class We8
         ];
 
         $_W['timestamp'] = TIMESTAMP;
-        $_W['charset'] = $_W['config']['charset'];
+        $_W['charset'] = $_W['config']['setting']['charset'];
         $_W['clientip'] = CLIENT_IP;
         $_W['ishttps'] = $request->getIsSecureConnection();
         $_W['isajax'] = $request->getIsAjax();
@@ -332,7 +337,7 @@ class We8
         $_W['container'] = $containerTypes[Agent::deviceType()] ?? 'unknown';
 
         // TODO 目前全部接受COOKIE, 需过滤cookiepre?
-        $_GPC = array_merge($_GPC, $_GET, $_POST, $_COOKIE);
+        $_GPC = array_merge($_GPC, $request->get(), $request->post(), $_COOKIE);
         if ( ! $_W['isajax']) {
             $input = Yii::$app->request->rawBody;
             if ( ! empty($input)) {
@@ -343,5 +348,25 @@ class We8
                 }
             }
         }
+    }
+
+    public function startWeb()
+    {
+        global $_W;
+        $_W['token'] = token();
+
+        $user = Yii::$app->user;
+        if (!$user->isGuest) {
+            $_W['uid'] = $user->id;
+            $_W['useranme'] = $user->getIdentity()->user_login;
+            $_W['user'] = $user->getIdentity();
+        }
+        $account = Yii::createObject(\weikit\services\AccountService::class)->managing();
+        $_W['uniacid'] = $account ? $account->uniacid : 0;
+    }
+
+    public function startApp()
+    {
+        
     }
 }
