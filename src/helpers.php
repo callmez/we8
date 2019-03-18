@@ -3,7 +3,6 @@
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
-use weikit\core\exceptions\UnsupportedException;
 
 class Loader
 {
@@ -1165,7 +1164,7 @@ function emoji_unicode_decode($string)
 function emoji_unicode_encode($string)
 {
     // TODO 转换emoji为emoji字符串
-    throw new UnsupportedException('Emoji encode not is support yet');
+    throw new RuntimeException('Emoji encode not is support yet');
 }
 
 /**
@@ -1552,11 +1551,6 @@ function pdo_commit()
 function pdo_rollback()
 {
     Yii::$app->db->getTransaction()->rollBack();
-}
-
-function pdo_debug($output = true, $append = [])
-{
-    throw new UnsupportedException();
 }
 
 /**

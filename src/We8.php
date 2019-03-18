@@ -288,7 +288,6 @@ class We8
 
         load()->library('agent');
         load()->classs('sqlparser');
-        load()->classs('account');
         load()->func('communication'); // TODO 替换
 
         $request = Yii::$app->request;
@@ -361,8 +360,8 @@ class We8
             $_W['useranme'] = $user->getIdentity()->user_login;
             $_W['user'] = $user->getIdentity();
         }
-        $account = Yii::createObject(\weikit\services\AccountService::class)->managing();
-        $_W['uniacid'] = $account ? $account->uniacid : 0;
+
+        $_W['uniacid'] = Yii::$app->session->get('session_manage_account', 0);
     }
 
     public function startApp()
