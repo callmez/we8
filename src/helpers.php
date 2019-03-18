@@ -3,6 +3,7 @@
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use yii\helpers\HtmlPurifier;
+use weikit\core\helpers\Pinyin; // TODO remove weikit support
 
 class Loader
 {
@@ -1109,7 +1110,7 @@ function dir_size($dir)
  */
 function get_first_pinyin($string)
 {
-    return Yii::$app->pinyin->firstChar($string);
+    return Pinyin::firstChar($string);
 }
 
 /**
@@ -1260,7 +1261,7 @@ function pdo_fetchcolumn($sql, $params = [], int $column = 0)
     SqlParser::checkQuery($sql);
     $command = Yii::$app->db->createCommand($sql, $params);
     if ($column === 0) {
-        return $command->queryColumn();
+        return $command->queryScalar();
     } else {
         $result = $command->queryAll(\PDO::FETCH_NUM);
 

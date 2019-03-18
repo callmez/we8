@@ -37,10 +37,11 @@ class We8
     public function initConstants()
     {
         // base
-        define('IN_IA', true);
         define('WE8_PATH', __DIR__);
         define('TIMESTAMP', intval(YII_BEGIN_TIME));
         define('STARTTIME', (YII_BEGIN_TIME - TIMESTAMP) . '0000 ' . TIMESTAMP);
+
+        define('IN_IA', true);
         define('IA_ROOT', Yii::getAlias('@wp'));
 
         define('CLIENT_IP', getip());
@@ -352,6 +353,8 @@ class We8
     public function startWeb()
     {
         global $_W;
+        define('IN_SYS', true);
+
         $_W['token'] = token();
 
         $user = Yii::$app->user;
@@ -366,6 +369,6 @@ class We8
 
     public function startApp()
     {
-        
+        define('IN_MOBILE', true);
     }
 }
