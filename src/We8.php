@@ -318,7 +318,7 @@ class We8
         $_W['ispost'] = $request->getIsPost();
         $_W['sitescheme'] = $_W['ishttps'] ? 'https://' : 'http://';
         $_W['script_name'] = $request->getScriptFile();
-        $_W['siteroot'] = Yii::getAlias('@webroot') . '/';
+        $_W['siteroot'] = $request->getHostInfo() . $request->getBaseUrl() . '/';
         $_W['siteurl'] = $request->getAbsoluteUrl();
 
         $osTypes = [
