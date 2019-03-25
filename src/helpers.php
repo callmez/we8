@@ -1586,7 +1586,8 @@ function pdo_run($sql)
  */
 function pdo_fieldexists($tablename, $fieldName = '')
 {
-    return Yii::$app->db->getSchema()->getTableSchema(pdo_tablename($tablename))->getColumn($fieldName) !== null;
+    $schema = Yii::$app->db->getSchema()->getTableSchema(pdo_tablename($tablename));
+    return $schema && $schema->getColumn($fieldName) !== null;
 }
 
 /**
