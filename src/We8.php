@@ -353,7 +353,7 @@ class We8
     public function startWeb()
     {
         global $_W;
-        define('IN_SYS', true);
+//        define('IN_SYS', true);
 
         $_W['token'] = token();
 
@@ -369,6 +369,6 @@ class We8
 
     public function startApp()
     {
-        define('IN_MOBILE', true);
+//        define('IN_MOBILE', true);
     }
 }
